@@ -95,41 +95,103 @@ class Player
   end
 end
 
+class Computer < Player
+
+  attr_accessor :board
+
+  def initialize(marker, board)
+    super(marker)
+    @board = board
+  end
+
+  def move
+
+
+
+    # if there are two squares checked, mark the third
+
+    # if an immediate threat, choose a square
+
+    # go through winninglines, if the line has two human markers, pick the third
+
+    board[board.unmarked_keys.sample] = self.marker
+  end
+end
+
+class ScoreBoard
+  attr_accessor :human, :computer
+  
+  def initialize
+
+    @human = 0
+    @computer = 0
+
+  end
+  def display_game
+    "Your Score: #{human}, Computer Score: #{computer}"
+  end
+
+  def clear
+    @human = 0
+    @computer = 0
+  end
+
+end
+
 class TTTGame
   HUMAN_MARKER = "X"
   COMPUTER_MARKER = "O"
   FIRST_TO_MOVE = HUMAN_MARKER
+  SCORE_NEEDED_TO_WIN = 2
 
   attr_reader :board, :human, :computer
+  attr_accessor :scoreboard
+
   def initialize
     @board = Board.new
     @human = Player.new(HUMAN_MARKER)
-    @computer = Player.new(COMPUTER_MARKER)
+    @computer = Computer.new(COMPUTER_MARKER, board)
     @current_marker = FIRST_TO_MOVE
+    @scoreboard = ScoreBoard.new
   end
 
   def play
     clear
     display_welcome_message
 
-    loop do
-      display_board
+    loop do 
+        loop do
+          display_board
+          loop do
+          display_game_total
 
-      loop do
-        current_player_moves
-        break if board.someone_won? || board.full?
-        clear_screen_and_display_board
+            current_player_moves
+            break if board.someone_won? || board.full?
+            clear_screen_and_display_board
+          end
+
+          display_result
+
+          break if game_winner?
+          
+          display_game_total
+
+          puts "Round finished. Press any key to continue"
+          any_key = gets.chomp
+          reset
+        end
+        display_game_winner
+        break unless play_again?
+        reset
+        scoreboard.clear
+        display_play_again_message
       end
 
-      display_result
-      break unless play_again?
-      reset
-      display_play_again_message
-    end
     display_goodbye_message
   end
 
   private
+
 
   def display_welcome_message
     puts ""
@@ -143,6 +205,19 @@ class TTTGame
 
   def clear
     system 'clear'
+  end
+
+  def display_game_total
+    puts "Your Score: #{scoreboard.human}, Computer Score: #{scoreboard.computer}"
+  end
+
+
+  def game_winner?
+    scoreboard.human == SCORE_NEEDED_TO_WIN || scoreboard.computer == SCORE_NEEDED_TO_WIN
+  end
+
+  def display_game_winner
+    puts "SOMEONE WON!"
   end
 
   def display_board
@@ -166,7 +241,7 @@ class TTTGame
       human_moves
       @current_marker = COMPUTER_MARKER
     else
-      computer_moves
+      computer.move
       @current_marker = HUMAN_MARKER
     end
   end
@@ -183,16 +258,30 @@ class TTTGame
     board[square] = human.marker
   end
 
-  def computer_moves
-    board[board.unmarked_keys.sample] = computer.marker
-  end
+  # def computer_moves
+
+
+
+  #   # if there are two squares checked, mark the third
+
+  #   # if an immediate threat, choose a square
+
+  #   # go through winninglines, if the line has two human markers, pick the third
+
+  #   board[board.unmarked_keys.sample] = computer.marker
+  # end
 
   def display_result
     clear_screen_and_display_board
     case board.winning_marker
-    when human.marker then puts "You won!"
-    when computer.marker then puts "Computer won!"
-    else puts "It's a tie!"
+    when human.marker 
+      scoreboard.human += 1
+      puts "You won!"
+    when computer.marker
+      scoreboard.computer += 1
+     puts "Computer won!"
+    else 
+      puts "It's a tie!"
     end
   end
 
