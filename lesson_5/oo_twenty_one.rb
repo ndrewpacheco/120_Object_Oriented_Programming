@@ -221,10 +221,12 @@ class Game
     clear
     player.show_cards
     puts ""
+    if player.busted?
+      return player.show_total
+    end
     dealer.show_cards
     puts ""
     player.show_total
-    return if player.busted?
     dealer.show_total
     show_winner
   end
