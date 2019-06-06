@@ -10,7 +10,7 @@ class Car
 
   def increment_mileage(miles)
     total = mileage + miles
-    @mileage = total
+    self.mileage = total
   end
 
   def print_mileage
