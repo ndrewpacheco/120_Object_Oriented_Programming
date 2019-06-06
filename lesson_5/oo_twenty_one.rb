@@ -183,15 +183,6 @@ class Game
       break if player.busted?
       player.show_total
       break if player.stay?
-      # answer = nil
-      # loop do
-      #   puts "Would you like to hit or stay? Press 'h' for hit, 's' to stay"
-      #   answer = gets.chomp.downcase
-      #   puts ""
-      #   break if ['h', 's'].include?(answer)
-      #   puts "That was not a valid answer, try again."
-      # end
-      # break if answer == "s" #player.stay?
       player.hit(deck)
       clear
       show_initial_cards
