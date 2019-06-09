@@ -148,8 +148,12 @@ class TTTGame
   end
 
   def set_name_for_player
-    puts "What is your name?"
-    human.name = gets.chomp
+    loop do 
+      puts "What is your name?"
+      human.name = gets.chomp
+      break unless human.name.empty?
+      puts "Not a valid name, try again"
+    end
   end
 
   def round_moves

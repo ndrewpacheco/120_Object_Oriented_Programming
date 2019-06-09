@@ -9,8 +9,11 @@ class Participant
     deck.deal(self)
   end
 
+  def blackjack?
+    total == Game::BLACKJACK
+  end
   def busted?
-    total > 21
+    total > Game::BLACKJACK
   end
 
   def show_cards
@@ -50,19 +53,28 @@ end
 
 class Player < Participant
   def stay?
+    get_hit_or_stay == "s"
+  end
+
+  def get_hit_or_stay
     answer = nil
     loop do
       puts "Would you like to hit or stay? Press 'h' for hit, 's' to stay"
       answer = gets.chomp.downcase
       puts ""
-      break if ['h', 's'].include?(answer)
+      break if valid_hit_or_stay?(answer)
       puts "That was not a valid answer, try again."
     end
-    answer == "s"
+    answer
+  end
+
+  def valid_hit_or_stay?(answer)
+    ['h', 's'].include?(answer)
   end
 
   def show_total
-    return puts "You busted!" if total > 21
+    return puts "You have blackjack!" if blackjack?
+    return puts "You busted!" if busted?
     puts "Your total is: #{total}"
   end
 
@@ -74,7 +86,8 @@ end
 
 class Dealer < Participant
   def show_total
-    return puts "Dealer busted!" if total > 21
+    return puts "Dealer has blackjack!" if blackjack?
+    return puts "Dealer busted!" if busted?
     puts "Dealer's total is: #{total}"
   end
 
@@ -130,6 +143,7 @@ class Card
 end
 
 class Game
+  BLACKJACK = 21
   attr_reader :player, :dealer, :deck
 
   def initialize
@@ -158,9 +172,18 @@ class Game
 
   def welcome_message
     puts "Welcome to Twenty One!"
-    puts "What is your name?"
-    player.name = gets.chomp.capitalize
+    get_name
     clear
+  end
+
+  def get_name
+    loop do 
+      puts "What is your name?"
+      player.name = gets.chomp.capitalize
+      break unless player.name.empty?
+      puts "Not a valid name, try again"
+    end
+
   end
 
   def deal_initial_cards
@@ -180,6 +203,7 @@ class Game
 
   def player_turn
     loop do
+      break if player.blackjack?
       break if player.busted?
       player.show_total
       break if player.stay?
