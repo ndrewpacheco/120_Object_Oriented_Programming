@@ -11,6 +11,7 @@ end
 
 class Truck
   include Towable
+  
 end
 
 class Car

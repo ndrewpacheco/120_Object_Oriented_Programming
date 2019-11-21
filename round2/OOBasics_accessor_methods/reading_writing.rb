@@ -2,6 +2,7 @@
 # Add the appropriate accessor methods to the following code.
 
 class Person
+  
 end
 
 person1 = Person.new
