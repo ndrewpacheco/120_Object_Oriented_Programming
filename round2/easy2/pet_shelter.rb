@@ -19,8 +19,6 @@ class Owner
 end
 
 class Shelter
-
-
   def initialize
     @shelter = {}
   end
