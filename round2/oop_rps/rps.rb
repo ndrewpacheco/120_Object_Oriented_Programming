@@ -70,31 +70,52 @@ class Computer < Player
 end
 
 class RPSGame
-  attr_accessor :human, :computer
+  attr_accessor :human, :computer, :scoreboard
 
   def initialize
+
     @human = Human.new
     @computer = Computer.new
+    @scoreboard = {human => 0, computer => 0}
+
   end
 
   def display_welcome_message
     puts "Welcome to Rock, Paper, Scissors!"
   end
 
+  def display_scoreboard
+    puts "The score is: "
+    puts "#{human.name}: #{scoreboard[human]} "
+    puts "#{computer.name}: #{scoreboard[computer]}"
+    puts "The first to 2 wins!"
+  end
   def display_goodbye_message
     puts "Thanks for playing Rock, Paper, Scissors! Goodbye!"
   end
 
-  def display_winner
+  def display_round_winner
     puts "#{human.name} chose #{human.move}"
     puts "#{computer.name} chose: #{computer.move}"
 
     if human.move > computer.move
-      puts "#{human.name} won!"
+      scoreboard[human] += 1
+      puts "#{human.name} won the round!"
     elsif computer.move > human.move
-      puts "#{computer.name} won!"
+      scoreboard[computer] += 1
+      puts "#{computer.name} won the round!"
     else
       puts "It's a tie!"
+    end
+
+    def winner?
+      scoreboard.values.include?(2)
+    end
+
+    def display_winner
+
+      return puts "#{human.name} won the game!" if scoreboard[human] == 2
+      return puts "#{computer.name} won the game!" if scoreboard[computer] == 2
     end
     # case human.move
     # when 'rock'
@@ -125,13 +146,26 @@ class RPSGame
     false
   end
 
+
+  def game
+    loop do 
+      display_scoreboard
+      human.choose
+      computer.choose
+      puts ""
+      display_round_winner
+      break if winner?
+    end
+    display_winner
+  end
+
   def play
     display_welcome_message
 
     loop do
-      human.choose
-      computer.choose
-      display_winner
+
+      game
+
       break unless play_again?
     end
     display_goodbye_message
